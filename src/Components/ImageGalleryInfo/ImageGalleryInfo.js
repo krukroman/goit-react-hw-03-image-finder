@@ -1,12 +1,26 @@
 import { Component } from 'react';
-import getImages from '../../services/apiService';
+import fetchImages from '../../services/apiService';
 import ImageGallery from './ImageGallery';
 import Button from '../Button';
 import Loader from '../Loader';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+const TOAST_OPTIONS = {
+  position: 'top-right',
+  autoClose: 5000,
+  hideProgressBar: false,
+  closeOnClick: true,
+  pauseOnHover: true,
+  draggable: true,
+  progress: undefined,
+  theme: 'colored',
+};
 
 export default class ImagesGalleryInfo extends Component {
   stateDefault = {
     pageNumber: 1,
+    perPage: 12,
   };
 
   state = {
@@ -14,65 +28,85 @@ export default class ImagesGalleryInfo extends Component {
     images: null,
     showLoadMoreBtn: false,
     status: 'idle',
+    error: null,
   };
 
   componentDidUpdate(prevProps, prevState) {
-    const prevQuery = prevProps.searchQuery;
-    const nextQuery = this.props.searchQuery;
+    const prevSearchQuery = prevProps.searchQuery;
+    const nextSeachQuery = this.props.searchQuery;
 
-    const currentPageNumber = prevState.pageNumber;
-    const nextPageNumber = this.state.pageNumber;
-
-    if (prevQuery !== nextQuery) {
-      this.getImagesByNewQuery(nextQuery);
-    }
-
-    if (nextPageNumber > currentPageNumber) {
-      this.loadMoreImages(prevQuery, prevState, nextPageNumber);
-    }
-  }
-
-  getImagesByNewQuery(newSearchQuery) {
     const defaultPageNumber = this.stateDefault.pageNumber;
-    this.setState({ status: 'pending' });
-    getImages(newSearchQuery, defaultPageNumber).then(images => {
-      this.setState({
-        images: images.hits,
-        pageNumber: defaultPageNumber,
-        showLoadMoreBtn: true,
-        status: 'resolved',
-      });
-      if (images.hits.length === 0 || images.hits.length < 12) {
-        this.setState({
-          showLoadMoreBtn: false,
-        });
-      }
-      this.smoothScrollUp();
-    });
+    const defaultPerPage = this.stateDefault.perPage;
+
+    const prevPageNumber = prevState.pageNumber;
+    const nextPageNumber = this.state.pageNumber;
+    const prevImages = prevState.images;
+
+    if (prevSearchQuery !== nextSeachQuery) {
+      this.resetPageNubmer();
+      this.getImages(nextSeachQuery, defaultPageNumber, defaultPerPage);
+    }
+    if (nextPageNumber > prevPageNumber) {
+      this.getImages(
+        prevSearchQuery,
+        nextPageNumber,
+        defaultPerPage,
+        prevImages,
+      );
+    }
   }
 
-  loadMoreImages(prevQuery, prevState, nextPageNumber) {
-    this.setState({ status: 'pending' });
-    getImages(prevQuery, nextPageNumber).then(images => {
-      this.setState({
-        images: [...prevState.images, ...images.hits],
-        showLoadMoreBtn: true,
-        status: 'resolved',
-      });
-      if (images.hits.length === 0 || images.hits.length < 12) {
-        this.setState({
-          showLoadMoreBtn: false,
-        });
-      }
-      this.smoothScrollDown();
+  getImages = (query, page, perPage, prevImages) => {
+    this.setState({
+      status: 'pending',
     });
-  }
+    fetchImages(query, page, perPage)
+      .then(response => {
+        const { hits, totalHits } = response;
+        if (totalHits === 0) {
+          this.setState({
+            images: null,
+            status: 'rejected',
+          });
+          toast.error(`By query "${query}" images not found`, TOAST_OPTIONS);
+          return;
+        } else if (hits.length < 12) {
+          toast.warn(`That is all we found by query "${query}"`, TOAST_OPTIONS);
+          this.setState({
+            status: 'resolved',
+            showLoadMoreBtn: false,
+          });
+        } else {
+          this.setState({
+            status: 'resolved',
+            showLoadMoreBtn: true,
+          });
+        }
+        this.setState({
+          images: prevImages
+            ? [...prevImages, ...response.hits]
+            : [...response.hits],
+        });
+        this.smoothScrollDown();
+      })
+      .catch(error => {
+        this.setState({
+          error: error.message,
+        });
+      });
+  };
 
   onLoadMoreBtnClick = e => {
     e.preventDefault();
     this.setState(prevState => ({
       pageNumber: prevState.pageNumber + 1,
     }));
+  };
+
+  resetPageNubmer = () => {
+    this.setState({
+      pageNumber: this.stateDefault.pageNumber,
+    });
   };
 
   smoothScrollDown() {
@@ -82,26 +116,23 @@ export default class ImagesGalleryInfo extends Component {
     });
   }
 
-  smoothScrollUp() {
-    window.scrollTo({
-      top: document.getElementById('root'),
-      behavior: 'smooth',
-    });
-  }
-
   render() {
     const { images, showLoadMoreBtn, status } = this.state;
+    const { onClick } = this.props;
     const onLoadMoreBtnClick = this.onLoadMoreBtnClick;
 
     return (
       <>
-        <ImageGallery galleryData={images} />
+        <ImageGallery galleryData={images} onClick={onClick} />
         {showLoadMoreBtn && (
           <div className="ButtonWrapper">
-            <Button title="Load more" onClick={onLoadMoreBtnClick} />
+            <Button className="Button" onClick={onLoadMoreBtnClick}>
+              Load more
+            </Button>
           </div>
         )}
         {status === 'pending' && <Loader />}
+        <ToastContainer />
       </>
     );
   }

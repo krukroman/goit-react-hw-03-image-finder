@@ -1,5 +1,5 @@
 import ImageGalleryItem from './ImageGalleryItem';
-export default function ImageGallery({ galleryData }) {
+export default function ImageGallery({ galleryData, onClick }) {
   return (
     <ul className="ImageGallery">
       {galleryData &&
@@ -10,6 +10,7 @@ export default function ImageGallery({ galleryData }) {
               previewUrl={webformatURL}
               originUrl={largeImageURL}
               tags={tags}
+              onClick={onClick}
             />
           );
         })}

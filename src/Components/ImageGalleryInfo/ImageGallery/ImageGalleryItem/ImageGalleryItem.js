@@ -7,11 +7,11 @@ export default function ImageGalleryItem({
   return (
     <li className="ImageGalleryItem">
       <img
-        onClick={onClick}
         src={previewUrl}
         data-source={originUrl}
         alt={tags}
         className="ImageGalleryItem-image"
+        onClick={e => onClick({ originUrl, tags })}
       />
     </li>
   );

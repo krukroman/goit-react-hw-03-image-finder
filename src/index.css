@@ -20,7 +20,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-img {
+img,
+svg {
   display: block;
   max-width: 100%;
   height: auto;
@@ -174,6 +175,24 @@ img {
 .Modal {
   max-width: calc(100vw - 48px);
   max-height: calc(100vh - 24px);
+}
+
+.CloseModalButton {
+  position: absolute;
+  top: 15px;
+  right: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  cursor: pointer;
+  background-color: transparent;
+  border: 2px solid #fff;
+  border-radius: 50%;
+}
+
+.CloseModalButton svg {
+  fill: white;
 }
 
 /*

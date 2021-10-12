@@ -5,13 +5,7 @@ const portal = document.getElementById('portal');
 export default function Loader() {
   return createPortal(
     <div className="Overlay">
-      <Spinner
-        type="Grid"
-        color="#3f51b5"
-        height={100}
-        width={100}
-        timeout={3000}
-      />
+      <Spinner type="Oval" color="#fff" height={150} width={150} />
     </div>,
     portal,
   );
