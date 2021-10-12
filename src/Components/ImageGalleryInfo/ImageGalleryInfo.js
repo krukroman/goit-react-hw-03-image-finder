@@ -66,6 +66,7 @@ export default class ImagesGalleryInfo extends Component {
         if (totalHits === 0) {
           this.setState({
             images: null,
+            showLoadMoreBtn: false,
             status: 'rejected',
           });
           toast.error(`By query "${query}" images not found`, TOAST_OPTIONS);
@@ -73,13 +74,13 @@ export default class ImagesGalleryInfo extends Component {
         } else if (hits.length < 12) {
           toast.warn(`That is all we found by query "${query}"`, TOAST_OPTIONS);
           this.setState({
-            status: 'resolved',
             showLoadMoreBtn: false,
+            status: 'resolved',
           });
         } else {
           this.setState({
-            status: 'resolved',
             showLoadMoreBtn: true,
+            status: 'resolved',
           });
         }
         this.setState({
@@ -87,7 +88,7 @@ export default class ImagesGalleryInfo extends Component {
             ? [...prevImages, ...response.hits]
             : [...response.hits],
         });
-        this.smoothScrollDown();
+        prevImages ? this.smoothScrollDown() : this.smoothScrollUp();
       })
       .catch(error => {
         this.setState({
@@ -109,12 +110,18 @@ export default class ImagesGalleryInfo extends Component {
     });
   };
 
-  smoothScrollDown() {
+  smoothScrollDown = () => {
     window.scrollTo({
       top: document.documentElement.scrollHeight,
       behavior: 'smooth',
     });
-  }
+  };
+  smoothScrollUp = () => {
+    window.scrollTo({
+      top: document.getElementById('root'),
+      behavior: 'smooth',
+    });
+  };
 
   render() {
     const { images, showLoadMoreBtn, status } = this.state;
