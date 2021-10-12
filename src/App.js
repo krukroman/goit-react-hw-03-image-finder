@@ -1,9 +1,10 @@
 import { Component } from 'react';
 import Searchbar from './Components/Searchbar';
+import ImagesGalleryInfo from './Components/ImageGalleryInfo';
 
 export default class App extends Component {
   state = {
-    searchQuery: '',
+    searchQuery: null,
   };
 
   onSearchbarSubmit = searchQuery => {
@@ -17,7 +18,13 @@ export default class App extends Component {
   };
 
   render() {
-    const onSubmit = this.onSearchbarSubmit;
-    return <Searchbar onSubmit={onSubmit} />;
+    const { searchQuery } = this.state;
+    const onSearchbarSubmit = this.onSearchbarSubmit;
+    return (
+      <>
+        <Searchbar onSubmit={onSearchbarSubmit} />
+        <ImagesGalleryInfo searchQuery={searchQuery} />
+      </>
+    );
   }
 }

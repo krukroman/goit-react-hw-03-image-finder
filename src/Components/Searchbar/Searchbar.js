@@ -15,16 +15,19 @@ export default class Searchbar extends Component {
   handleSubmit = e => {
     e.preventDefault();
     const { searchQuery } = this.state;
-    this.props.onSubmit(searchQuery);
+    this.props.onSubmit(searchQuery.toLocaleLowerCase());
+    this.setState({
+      searchQuery: '',
+    });
   };
 
   render() {
     const { searchQuery } = this.state;
-    const onSubmit = this.handleSubmit;
-    const onChange = this.handleChange;
+    const handleSubmit = this.handleSubmit;
+    const handleChange = this.handleChange;
     return (
       <header className="Searchbar">
-        <form className="SearchForm" onSubmit={onSubmit}>
+        <form className="SearchForm" onSubmit={handleSubmit}>
           <button type="submit" className="SearchForm-button">
             <span className="SearchForm-button-label">Search</span>
           </button>
@@ -32,7 +35,7 @@ export default class Searchbar extends Component {
           <input
             className="SearchForm-input"
             type="text"
-            onChange={onChange}
+            onChange={handleChange}
             value={searchQuery}
             autoComplete="off"
             autoFocus
