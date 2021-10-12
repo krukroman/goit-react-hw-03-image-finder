@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import PropTypes from 'prop-types';
 import fetchImages from '../../services/apiService';
 import ImageGallery from './ImageGallery';
 import Button from '../Button';
@@ -144,3 +145,8 @@ export default class ImagesGalleryInfo extends Component {
     );
   }
 }
+
+ImagesGalleryInfo.propTypes = {
+  searchQuery: PropTypes.string,
+  onClick: PropTypes.func.isRequired,
+};

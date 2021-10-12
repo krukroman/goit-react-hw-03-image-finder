@@ -1,5 +1,6 @@
 import { Component } from 'react';
 import { createPortal } from 'react-dom';
+import PropTypes from 'prop-types';
 import Button from '../Button';
 import { ReactComponent as CloseIcon } from './icon-close.svg';
 
@@ -48,3 +49,11 @@ export default class Modal extends Component {
     );
   }
 }
+
+Modal.propTypes = {
+  image: PropTypes.shape({
+    url: PropTypes.string,
+    tags: PropTypes.string,
+  }),
+  onClose: PropTypes.func.isRequired,
+};
