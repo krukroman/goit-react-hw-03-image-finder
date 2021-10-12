@@ -2,6 +2,7 @@ import { Component } from 'react';
 import getImages from '../../services/apiService';
 import ImageGallery from './ImageGallery';
 import Button from '../Button';
+import Loader from '../Loader';
 
 export default class ImagesGalleryInfo extends Component {
   stateDefault = {
@@ -12,6 +13,7 @@ export default class ImagesGalleryInfo extends Component {
     pageNumber: this.stateDefault.pageNumber,
     images: null,
     showLoadMoreBtn: false,
+    status: 'idle',
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -22,7 +24,6 @@ export default class ImagesGalleryInfo extends Component {
     const nextPageNumber = this.state.pageNumber;
 
     if (prevQuery !== nextQuery) {
-      this.smoothScrollUp();
       this.getImagesByNewQuery(nextQuery);
     }
 
@@ -33,25 +34,30 @@ export default class ImagesGalleryInfo extends Component {
 
   getImagesByNewQuery(newSearchQuery) {
     const defaultPageNumber = this.stateDefault.pageNumber;
+    this.setState({ status: 'pending' });
     getImages(newSearchQuery, defaultPageNumber).then(images => {
       this.setState({
         images: images.hits,
         pageNumber: defaultPageNumber,
         showLoadMoreBtn: true,
+        status: 'resolved',
       });
       if (images.hits.length === 0 || images.hits.length < 12) {
         this.setState({
           showLoadMoreBtn: false,
         });
       }
+      this.smoothScrollUp();
     });
   }
 
   loadMoreImages(prevQuery, prevState, nextPageNumber) {
+    this.setState({ status: 'pending' });
     getImages(prevQuery, nextPageNumber).then(images => {
       this.setState({
         images: [...prevState.images, ...images.hits],
         showLoadMoreBtn: true,
+        status: 'resolved',
       });
       if (images.hits.length === 0 || images.hits.length < 12) {
         this.setState({
@@ -84,18 +90,18 @@ export default class ImagesGalleryInfo extends Component {
   }
 
   render() {
-    const { images, showLoadMoreBtn } = this.state;
+    const { images, showLoadMoreBtn, status } = this.state;
     const onLoadMoreBtnClick = this.onLoadMoreBtnClick;
 
     return (
       <>
         <ImageGallery galleryData={images} />
-
         {showLoadMoreBtn && (
           <div className="ButtonWrapper">
             <Button title="Load more" onClick={onLoadMoreBtnClick} />
           </div>
         )}
+        {status === 'pending' && <Loader />}
       </>
     );
   }

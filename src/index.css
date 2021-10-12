@@ -126,8 +126,7 @@ img {
   max-width: calc(100vw - 48px);
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   grid-gap: 16px;
-  margin-top: 80;
-  margin-bottom: 0;
+  margin-bottom: 20px;
   padding: 0;
   list-style: none;
   margin-left: auto;
@@ -181,7 +180,7 @@ img {
 * Стили компонента Buton (Load more)
 */
 .ButtonWrapper {
-  margin-block: 20px;
+  margin-bottom: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
