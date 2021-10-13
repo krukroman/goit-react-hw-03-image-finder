@@ -63,8 +63,8 @@ export default class ImagesGalleryInfo extends Component {
     });
     fetchImages(query, page, perPage)
       .then(response => {
-        const { hits, totalHits } = response;
-        if (totalHits === 0) {
+        const { hits, total } = response;
+        if (total === 0) {
           this.setState({
             images: null,
             showLoadMoreBtn: false,
@@ -72,7 +72,8 @@ export default class ImagesGalleryInfo extends Component {
           });
           toast.error(`By query "${query}" images not found`, TOAST_OPTIONS);
           return;
-        } else if (hits.length < 12) {
+        }
+        if (hits.length < 12 || page === Math.ceil(total / hits.length)) {
           toast.warn(`That is all we found by query "${query}"`, TOAST_OPTIONS);
           this.setState({
             showLoadMoreBtn: false,
@@ -85,9 +86,7 @@ export default class ImagesGalleryInfo extends Component {
           });
         }
         this.setState({
-          images: prevImages
-            ? [...prevImages, ...response.hits]
-            : [...response.hits],
+          images: prevImages ? [...prevImages, ...hits] : [...hits],
         });
         prevImages ? this.smoothScrollDown() : this.smoothScrollUp();
       })
