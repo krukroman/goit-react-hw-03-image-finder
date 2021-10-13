@@ -73,7 +73,7 @@ export default class ImagesGalleryInfo extends Component {
           toast.error(`By query "${query}" images not found`, TOAST_OPTIONS);
           return;
         }
-        if (hits.length < 12 || page === Math.ceil(total / hits.length)) {
+        if (page === Math.ceil(total / perPage)) {
           toast.warn(`That is all we found by query "${query}"`, TOAST_OPTIONS);
           this.setState({
             showLoadMoreBtn: false,
